@@ -1,6 +1,6 @@
 module.exports = {
-	title: 'Advanced Cropper',
-	description: 'The documentation for Vue Advanced Cropper library',
+	title: 'Vue Advanced Cropper',
+	description: 'The flexible vue cropper component that gives you the opportunity to create almost any cropper that you desire',
 	base: '/vue-advanced-cropper/',
 	head: [
 		['link', { rel: 'icon', href: '/favicon.png', }]
@@ -28,7 +28,8 @@ module.exports = {
 				title: 'Tutorials',
 				collapsable: false,
 				children: [
-					'/tutorials/recipes',
+					'/tutorials/basic-recipes',
+					'/tutorials/advanced-recipes',
 					'/tutorials/customize-appearance',
 					'/tutorials/custom-stencil'
 				],

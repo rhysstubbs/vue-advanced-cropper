@@ -41,6 +41,10 @@ export default {
 			type: String,
 			default: null,
 		},
+		bustCache: {
+			type: Boolean,
+			default: false,
+		},
 		allowedArea: {
 			type: Function,
 			default: algorithms.allowedArea,
@@ -121,6 +125,10 @@ export default {
 			type: Boolean,
 			default: true,
 		},
+		crossOrigin: {
+			type: String,
+			default: 'anonymous'
+		},
 		transitionTime: {
 			type: Number,
 			default: 300
@@ -189,7 +197,7 @@ export default {
 					left: 0,
 					top: 0
 				}
-			},
+			}
 		};
 	},
 	computed: {
@@ -204,7 +212,7 @@ export default {
 			};
 
 			// Disable some interactions for user convenience
-			settings.touchMove.enabled = settings.touchMove.enabled && (this.worldTransforms.scale !== 1 || this.imageRestriction === 'none');
+			settings.touchMove.enabled = settings.touchMove.enabled && (this.worldTransforms.scale !== 1 || this.imageRestriction !== 'area');
 
 			return settings;
 		},
@@ -361,7 +369,10 @@ export default {
 		window.addEventListener('resize', this.onResizeWindow);
 		window.addEventListener('orientationchange', this.onResizeWindow);
 		this.$refs.image.addEventListener('load', () => {
-			this.onLoadImage();
+			this.onSuccessLoadImage();
+		});
+		this.$refs.image.addEventListener('error', () => {
+			this.onFailLoadImage();
 		});
 		this.onChangeImage();
 	},
@@ -373,7 +384,7 @@ export default {
 		// External methods
 		getResult() {
 			const coordinates = this.prepareResult({ ...this.coordinates });
-			if (this.canvas && this.src) {
+			if (this.canvas && this.src && this.imageLoaded) {
 				this.updateCanvas(this.coordinates);
 				return {
 					coordinates,
@@ -475,24 +486,32 @@ export default {
 		onChangeImage() {
 			this.imageLoaded = false;
 			this.delayedTransforms = null;
+			this.imageAttributes.src = null;
 
 			if (this.src) {
 				const crossOrigin = isCrossOriginURL(this.src);
 				if (crossOrigin && this.canvas && this.checkCrossOrigin) {
-					this.imageAttributes.crossOrigin = 'anonymous';
+					this.imageAttributes.crossOrigin = this.crossOrigin;
 				}
 				setTimeout(() => {
+					const src = this.bustCache ? addTimestamp(this.src) : this.src;
 					if (this.checkOrientation) {
-						parseImage(crossOrigin ? addTimestamp(this.src) : this.src).then(this.onParseImage);
+						parseImage(src).then(this.onParseImage);
 					} else {
-						this.onParseImage({});
+						this.onParseImage({
+							source: src
+						});
 					}
 				}, this.transitionTime);
 			} else {
 				this.clearImage();
 			}
 		},
-		onLoadImage() {
+		onFailLoadImage() {
+			this.clearImage();
+			this.$emit('error');
+		},
+		onSuccessLoadImage() {
 			// After loading image the current component can be unmounted
 			// Therefore there is a workaround to prevent processing the following code
 			if (this.$refs.image && !this.imageLoaded) {
@@ -503,17 +522,21 @@ export default {
 				});
 			}
 		},
-		onParseImage({ arrayBuffer, orientation }) {
-			if (arrayBuffer && orientation && isLocal(this.src)) {
+		onParseImage({ source, arrayBuffer, orientation }) {
+			if (arrayBuffer && orientation && isLocal(source)) {
 				this.imageAttributes.src = arrayBufferToDataURL(arrayBuffer);
 			} else {
-				this.imageAttributes.src = this.src;
+				this.imageAttributes.src = source;
 			}
 			this.basicImageTransforms = getImageTransforms(orientation);
 			Vue.nextTick(() => {
 				const image = this.$refs.image;
 				if (image && image.complete) {
-					this.onLoadImage();
+					if (image.naturalWidth) {
+						this.onSuccessLoadImage();
+					} else {
+						this.onFailLoadImage();
+					}
 				}
 			});
 		},
@@ -764,12 +787,12 @@ export default {
 			setTimeout(() => {
 				stretcher.style.height = 'auto';
 				stretcher.style.width = 'auto';
-				this.onChangeCoordinates({ ...DEFAULT_COORDINATES }, false);
-				this.updateStencilCoordinates({ ...DEFAULT_COORDINATES });
+				this.coordinates = { ...DEFAULT_COORDINATES };
 				this.boundarySize = {
 					width: 0,
 					height: 0,
 				};
+				this.updateStencilCoordinates({ ...DEFAULT_COORDINATES });
 			}, this.transitionTime);
 		},
 		refreshImage() {

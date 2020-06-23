@@ -48,14 +48,11 @@
         >
         <div class="presentation__title-wrapper">
           <h1 class="presentation__title">
-            Advanced Cropper
-            <div class="presentation__version">
-              0.16
-            </div>
+	        Advanced Cropper
           </h1>
         </div>
         <div class="presentation__subtitle">
-          The flexible cropper component that gives you the opportunity to create almost any cropper that you desire
+	        The flexible Vue cropper component that gives you the opportunity to create almost any cropper that you desire. Identically easy to use and customize.
         </div>
 
         <div class="presentation__install">
@@ -140,7 +137,7 @@
         <div class="row">
           <div class="feature">
             <div class="feature__title">
-              Canvas and Coordinates
+              Canvas / Coordinates
             </div>
             <div class="feature__text">
               This Cropper can be used to create a canvas with a cropped area or just coordinates relative to the original image to crop it server-side in the future.
@@ -239,7 +236,7 @@
 
         <div class="row">
           <p>
-            Resize and move events are very flexible and allow you to create almost any moving and especially resizng logic (more details <a class="link">here</a>)
+            Resize and move events are very flexible and allow you to create almost any moving and especially resizng logic (more details <a class="link" href="/vue-advanced-cropper/events/move-event.html">here</a>)
           </p>
         </div>
 
@@ -312,6 +309,7 @@
           <a
             href="mailto:norserium@gmail.com"
             class="footer__email"
+            rel="nofollow"
           >
             norserium@gmail.com
           </a>
