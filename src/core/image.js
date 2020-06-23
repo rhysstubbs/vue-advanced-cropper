@@ -134,6 +134,7 @@ function getImageData(img) {
 				// Simple URL
 				} else {
 					let http = new XMLHttpRequest();
+					http.setRequestHeader('Origin', window.location.hostname);
 					http.onreadystatechange = function () {
 						if (this.readyState !== XHR_DONE) return;
 
