@@ -134,7 +134,7 @@ function getImageData(img) {
 				// Simple URL
 				} else {
 					let http = new XMLHttpRequest();
-					http.setRequestHeader('Origin', window.location.hostname);
+					
 					http.onreadystatechange = function () {
 						if (this.readyState !== XHR_DONE) return;
 
@@ -153,6 +153,7 @@ function getImageData(img) {
 					};
 					http.withCredentials  = false;
 					http.open('GET', img, true);
+					http.setRequestHeader('Origin', window.location.hostname);
 					http.responseType = 'arraybuffer';
 					http.send(null);
 				}
