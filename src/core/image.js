@@ -153,7 +153,6 @@ function getImageData(img) {
 					};
 					http.withCredentials  = false;
 					http.open('GET', img, true);
-					http.setRequestHeader('Origin', window.location.hostname);
 					http.responseType = 'arraybuffer';
 					http.send(null);
 				}
